@@ -169,6 +169,8 @@ void setup() {
   Serial.println("Leader: Dr. Aung Win Htut");
   Serial.println("AT Like Firmware for ESP8266");
   Serial.println("Ready to use Now");
+  Serial.print("ESP8266 chip ID is :: ");
+  Serial.println(ESP.getChipId());
 
 /////////////////////////////////////////////////
   Serial.println();
@@ -206,7 +208,7 @@ void setup() {
 ////////////////////////////////////////////////////////
   
   Serial.println();
-  Serial.print("Configuring access point...");
+  Serial.println("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(ssid, password);
 
