@@ -36,7 +36,20 @@ void setup() {
   sCmd.addCommand("HELLO", sayHello);        // Echos the string argument back
   sCmd.addCommand("P",     processCommand);  // Converts two arguments to integers and echos them back
   sCmd.setDefaultHandler(unrecognized);      // Handler for command that isn't matched  (says "What?")
-  Serial.println("Ready");
+  Serial.println("");
+  Serial.println("Green Hacker Team");
+  Serial.println("Leader: Dr. Aung Win Htut");
+  Serial.println("AT Like Firmware for ESP8266");
+  Serial.println("Ready to use Now");
+  
+  int i=0;
+  for(i=0;i<10;i++)
+  {
+    Serial.print("#");
+    delay(200);
+  }
+
+  Serial.println("");
 }
 
 void loop() {
