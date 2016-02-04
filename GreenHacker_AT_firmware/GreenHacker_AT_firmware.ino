@@ -64,6 +64,13 @@ void AT_CIFSR(){
   digitalWrite(arduinoLED, LOW);
 }
 
+void AT_RST(){
+  Serial.println("Restarting.......");
+  ESP.restart();  
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
  
 ////////////////////
 void LED_on() {
@@ -138,7 +145,7 @@ void setup() {
   sCmd.addCommand("AT+CWMODE",AT_CWMODE);     //Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
   sCmd.addCommand("AT+CWJAP",AT_CWJAP);       // AT+CWJAP="SSID", "password"       // SSID and password of router  Response :OK 
   sCmd.addCommand("AT+CIFSR",AT_CIFSR);       // Response :192.168.3.106   // Device got an IP from router.
-  //sCmd.addCommand("AT",AT);
+  sCmd.addCommand("AT+RST",AT_RST);
   //sCmd.addCommand("AT",AT);
   //sCmd.addCommand("AT",AT);
   //sCmd.addCommand("AT",AT);
@@ -155,7 +162,7 @@ void setup() {
   sCmd.addCommand("P",     processCommand);  // Converts two arguments to integers and echos them back
   sCmd.setDefaultHandler(unrecognized);      // Handler for command that isn't matched  (says "What?")
 
-
+/////////////////////////////////////////////
 
    Serial.println("");
   Serial.println("Green Hacker Team");
@@ -163,7 +170,7 @@ void setup() {
   Serial.println("AT Like Firmware for ESP8266");
   Serial.println("Ready to use Now");
 
-
+/////////////////////////////////////////////////
   Serial.println();
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -196,7 +203,7 @@ void setup() {
 
   // Wait a bit before scanning again
   delay(1000);
-
+////////////////////////////////////////////////////////
   
   Serial.println();
   Serial.print("Configuring access point...");
@@ -209,7 +216,7 @@ void setup() {
   server.on("/", handleRoot);
   server.begin();
   Serial.println("HTTP server started");
-  
+  /////////////////////////////////////////////////////
   int i=0;
   for(i=0;i<10;i++)
   {
