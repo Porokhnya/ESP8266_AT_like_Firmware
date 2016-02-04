@@ -5,7 +5,7 @@
 
 #include <SerialCommand.h>
 
-#define arduinoLED 13   // Arduino LED on board
+#define arduinoLED 2   // Arduino LED on board
 
 SerialCommand sCmd;     // The demo SerialCommand object
 
@@ -49,7 +49,35 @@ void loop() {
 void AT() {
   Serial.println("OK");
   digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
 }
+
+//Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
+void AT_CWMODE(){
+  Serial.println("OK");
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+
+// AT+CWJAP="SSID", "password"       // SSID and password of router  Response :OK 
+void AT_CWJAP(){
+  Serial.println("OK");
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+
+// Response :192.168.3.106   // Device got an IP from router.
+void AT_CIFSR(){
+  Serial.println("OK");
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+
+ 
 ////////////////////
 void LED_on() {
   Serial.println("LED on");
