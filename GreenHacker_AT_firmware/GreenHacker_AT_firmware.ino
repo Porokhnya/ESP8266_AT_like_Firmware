@@ -25,7 +25,8 @@ const char *password = "bluephoenix";
 
 ESP8266WebServer server(80);
 
-
+byte bLocalMAC[6];
+byte bAPMAC[6];
 
 
 
@@ -33,6 +34,22 @@ ESP8266WebServer server(80);
 
 /////////////////////
 
+
+void KKL() {
+  Serial.println();
+  Serial.println("Kaung Kaung Latt :: My Wife");
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+
+void Pyone() {
+  Serial.println();
+  Serial.println("Pyone Akri Thorn :: My Daughter");
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
 void AT() {
   Serial.println();
   Serial.println("AT OK");
@@ -198,8 +215,77 @@ void AT_CWJAP() {
   
 }
 
+void AT_CIPMUX(){
+  char* sFlag;
+    
+  char *arg;
+  Serial.println();
+  Serial.println("AT+CIPMUX OK");
+  arg = sCmd.next();
+ 
+  if (arg != NULL) {
+    sFlag = arg;
+    
+  }
+  else {
+    Serial.println("No arg, we assume you want to ON!");
+    //return 1; //error
+    sFlag="1";
+  }
 
+ 
+   
 
+  Serial.println("");
+  Serial.println("WiFi connected");  
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+}
+
+void AT_CIPSERVER(){
+  char* sSSID;
+  char* sPASS;
+  
+  char *arg;
+  Serial.println();
+  Serial.println("AT+CWJAP OK");
+  arg = sCmd.next();
+ 
+  if (arg != NULL) {
+    sSSID = arg;
+    Serial.print("SSID was: ");
+    Serial.println(sSSID);
+  }
+  else {
+    Serial.println("No SSID, Please TRY AGAIN!");
+    //return 1; //error
+  }
+
+  arg = sCmd.next();
+  if (arg != NULL) {
+    sPASS = arg;
+    Serial.print("PASSWORD was: ");
+    Serial.println(sPASS);
+      
+  }
+  else {
+    Serial.println("No PASSWORD, using NULL instead");
+    sPASS="";
+  }
+   WiFi.begin(sSSID, sPASS);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");  
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+}
 ////////////////////
 void LED_on() {
   Serial.println("LED on");
@@ -280,8 +366,14 @@ void setup() {
   sCmd.addCommand("AT+STACWMODE",AT_STACWMODE);     //Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
   sCmd.addCommand("AT+APCWMODE",AT_APCWMODE);
   sCmd.addCommand("AT+CWLAP",AT_CWLAP);
-  //sCmd.addCommand("AT",AT);
-  //sCmd.addCommand("AT",AT);
+  sCmd.addCommand("AT+CIPMUX",AT_CIPMUX);
+  sCmd.addCommand("AT+CIPSERVER",AT_CIPSERVER);
+  
+
+  
+  sCmd.addCommand("KKL",KKL);
+  sCmd.addCommand("Pyone",Pyone);
+  
   //sCmd.addCommand("AT",AT);
 
 
@@ -329,6 +421,39 @@ AT_CWLAP();
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
   Serial.println(myIP);
+
+ 
+
+  WiFi.macAddress(bLocalMAC);
+  WiFi.softAPmacAddress(bAPMAC);
+  Serial.print("AP MAC address     :");
+  Serial.print(bAPMAC[5],HEX);
+  Serial.print(":");
+  Serial.print(bAPMAC[4],HEX);
+  Serial.print(":");
+  Serial.print(bAPMAC[3],HEX);
+  Serial.print(":");
+  Serial.print(bAPMAC[2],HEX);
+  Serial.print(":");
+  Serial.print(bAPMAC[1],HEX);
+  Serial.print(":");
+  Serial.print(bAPMAC[0],HEX);
+  Serial.println("");
+  
+  Serial.print("Local MAC address  :");
+  Serial.print(bLocalMAC[5],HEX);
+  Serial.print(":");
+  Serial.print(bLocalMAC[4],HEX);
+  Serial.print(":");
+  Serial.print(bLocalMAC[3],HEX);
+  Serial.print(":");
+  Serial.print(bLocalMAC[2],HEX);
+  Serial.print(":");
+  Serial.print(bLocalMAC[1],HEX);
+  Serial.print(":");
+  Serial.print(bLocalMAC[0],HEX);
+  Serial.println("");
+  
   server.on("/", handleRoot);
   server.begin();
   Serial.println("HTTP server started");
