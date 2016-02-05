@@ -44,13 +44,6 @@ void AT() {
 
 
 // AT+CWJAP="SSID", "password"       // SSID and password of router  Response :OK 
-void AT_CWJAP(){
-  Serial.println();
-  Serial.println("AT+CWJAP OK");
-  digitalWrite(arduinoLED, HIGH);
-  delay(500);
-  digitalWrite(arduinoLED, LOW);
-}
 
 // Response :192.168.3.106   // Device got an IP from router.
 void AT_CIFSR(){
@@ -120,6 +113,93 @@ void AT_APCWMODE(){
   delay(500);
   digitalWrite(arduinoLED, LOW);
 }
+
+void AT_CWLAP(){
+  Serial.println();
+  Serial.println("AT+CWLAP OK");  
+  //WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  Serial.println("scan start");
+
+  // WiFi.scanNetworks will return the number of networks found
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0)
+    Serial.println("no networks found");
+  else
+  {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i)
+    {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
+      delay(10);
+    }
+  }
+  Serial.println("");
+
+  // Wait a bit before scanning again
+  delay(1000);
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+
+void AT_CWJAP() {
+  char* sSSID;
+  char* sPASS;
+  
+  char *arg;
+  Serial.println();
+  Serial.println("AT+CWJAP OK");
+  arg = sCmd.next();
+ 
+  if (arg != NULL) {
+    sSSID = arg;
+    Serial.print("SSID was: ");
+    Serial.println(sSSID);
+  }
+  else {
+    Serial.println("No SSID, Please TRY AGAIN!");
+    //return 1; //error
+  }
+
+  arg = sCmd.next();
+  if (arg != NULL) {
+    sPASS = arg;
+    Serial.print("PASSWORD was: ");
+    Serial.println(sPASS);
+      
+  }
+  else {
+    Serial.println("No PASSWORD, using NULL instead");
+    sPASS="";
+  }
+   WiFi.begin(sSSID, sPASS);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");  
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  
+}
+
+
+
 ////////////////////
 void LED_on() {
   Serial.println("LED on");
@@ -199,7 +279,7 @@ void setup() {
   sCmd.addCommand("AT+CWMODE?",AT_CWMODEQ);
   sCmd.addCommand("AT+STACWMODE",AT_STACWMODE);     //Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
   sCmd.addCommand("AT+APCWMODE",AT_APCWMODE);
-  //sCmd.addCommand("AT",AT);
+  sCmd.addCommand("AT+CWLAP",AT_CWLAP);
   //sCmd.addCommand("AT",AT);
   //sCmd.addCommand("AT",AT);
   //sCmd.addCommand("AT",AT);
@@ -238,38 +318,7 @@ void setup() {
   
   
 /////////////////////////////////////////////////
-  Serial.println();
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-  Serial.println("scan start");
-
-  // WiFi.scanNetworks will return the number of networks found
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0)
-    Serial.println("no networks found");
-  else
-  {
-    Serial.print(n);
-    Serial.println(" networks found");
-    for (int i = 0; i < n; ++i)
-    {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
-      delay(10);
-    }
-  }
-  Serial.println("");
-
-  // Wait a bit before scanning again
-  delay(1000);
+AT_CWLAP();
 ////////////////////////////////////////////////////////
   WiFi.mode(WIFI_AP_STA);
   Serial.println();
