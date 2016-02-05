@@ -20,8 +20,8 @@ extern "C" {
 SerialCommand sCmd;     // The demo SerialCommand object
 
 /* Set these to your desired credentials. */
-const char *ssid = "ExcellentService";
-const char *password = "asdfghjkl";
+const char *ssid = "ESPbluephoenix";
+const char *password = "bluephoenix";
 
 ESP8266WebServer server(80);
 
@@ -34,23 +34,19 @@ ESP8266WebServer server(80);
 /////////////////////
 
 void AT() {
-  Serial.println("OK");
+  Serial.println();
+  Serial.println("AT OK");
   digitalWrite(arduinoLED, HIGH);
   delay(500);
   digitalWrite(arduinoLED, LOW);
 }
 
-//Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
-void AT_CWMODE(){
-  Serial.println("OK");
-  digitalWrite(arduinoLED, HIGH);
-  delay(500);
-  digitalWrite(arduinoLED, LOW);
-}
+
 
 // AT+CWJAP="SSID", "password"       // SSID and password of router  Response :OK 
 void AT_CWJAP(){
-  Serial.println("OK");
+  Serial.println();
+  Serial.println("AT+CWJAP OK");
   digitalWrite(arduinoLED, HIGH);
   delay(500);
   digitalWrite(arduinoLED, LOW);
@@ -58,20 +54,72 @@ void AT_CWJAP(){
 
 // Response :192.168.3.106   // Device got an IP from router.
 void AT_CIFSR(){
-  Serial.println("OK");
+  Serial.println();
+  Serial.println("AT+CIFSR OK");
+  Serial.print("Local Wifi ip (Station)  :: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("WiFi AP ip (Acces Point) :: ");
+  Serial.println(WiFi.softAPIP());
   digitalWrite(arduinoLED, HIGH);
   delay(500);
   digitalWrite(arduinoLED, LOW);
 }
 
 void AT_RST(){
+  Serial.println();
   Serial.println("Restarting.......");
   ESP.restart();  
   digitalWrite(arduinoLED, HIGH);
   delay(500);
   digitalWrite(arduinoLED, LOW);
 }
+
+void AT_GMR(){
+  Serial.println();
+  Serial.println("AT+GMR OK");
+  Serial.println("Green Hacker AT firmware version 1.0a");
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+
+void AT_CWMODEQ(){
+  Serial.println();
+  Serial.println("AT+CWMODE OK");
+  Serial.println(WiFi.status());
+  WiFi.printDiag(Serial);
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+
+//Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
+void AT_STACWMODE(){
+  Serial.println();
+  Serial.println("AT+STACWMODE OK");
+  WiFi.mode(WIFI_STA);  
+  WiFi.printDiag(Serial);
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
+void AT_APCWMODE(){
+  Serial.println();
+  Serial.println("AT+APCWMODE OK");  
+  Serial.println("Configuring access point...");
+  /* You can remove the password parameter if you want the AP to be open. */
+  WiFi.softAP(ssid, password);
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
  
+ 
+  WiFi.mode(WIFI_AP);
+  WiFi.printDiag(Serial);
+  digitalWrite(arduinoLED, HIGH);
+  delay(500);
+  digitalWrite(arduinoLED, LOW);
+}
 ////////////////////
 void LED_on() {
   Serial.println("LED on");
@@ -80,11 +128,13 @@ void LED_on() {
 
 
 void LED_off() {
+  Serial.println();
   Serial.println("LED off");
   digitalWrite(arduinoLED, LOW);
 }
 
 void sayHello() {
+  Serial.println();
   char *arg;
   arg = sCmd.next();    // Get the next argument from the SerialCommand object buffer
   if (arg != NULL) {    // As long as it existed, take it
@@ -100,7 +150,7 @@ void sayHello() {
 void processCommand() {
   int aNumber;
   char *arg;
-
+  Serial.println();
   Serial.println("We're in processCommand");
   arg = sCmd.next();
   if (arg != NULL) {
@@ -142,13 +192,13 @@ void setup() {
   // Setup callbacks for SerialCommand commands
   //AT commands
   sCmd.addCommand("AT",AT);
-  sCmd.addCommand("AT+CWMODE",AT_CWMODE);     //Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
   sCmd.addCommand("AT+CWJAP",AT_CWJAP);       // AT+CWJAP="SSID", "password"       // SSID and password of router  Response :OK 
   sCmd.addCommand("AT+CIFSR",AT_CIFSR);       // Response :192.168.3.106   // Device got an IP from router.
   sCmd.addCommand("AT+RST",AT_RST);
-  //sCmd.addCommand("AT",AT);
-  //sCmd.addCommand("AT",AT);
-  //sCmd.addCommand("AT",AT);
+  sCmd.addCommand("AT+GMR",AT_GMR);
+  sCmd.addCommand("AT+CWMODE?",AT_CWMODEQ);
+  sCmd.addCommand("AT+STACWMODE",AT_STACWMODE);     //Wireless mode, AP, Station, AP+Station AT+CWMODE=3      // softAP+station mode  Response :OK
+  sCmd.addCommand("AT+APCWMODE",AT_APCWMODE);
   //sCmd.addCommand("AT",AT);
   //sCmd.addCommand("AT",AT);
   //sCmd.addCommand("AT",AT);
@@ -164,14 +214,29 @@ void setup() {
 
 /////////////////////////////////////////////
 
-   Serial.println("");
+  Serial.println("");
   Serial.println("Green Hacker Team");
   Serial.println("Leader: Dr. Aung Win Htut");
   Serial.println("AT Like Firmware for ESP8266");
   Serial.println("Ready to use Now");
-  Serial.print("ESP8266 chip ID is :: ");
+  Serial.print("ESP8266 chip ID is             :: ");
   Serial.println(ESP.getChipId());
-
+  //Serial.print("Last reset reason is :: ");
+  //Serial.println(ESP.getResetReason());
+  Serial.print("Free heap size is              :: ");
+  Serial.println(ESP.getFreeHeap());
+  Serial.print("Flash chip ID is               :: ");
+  Serial.println(ESP.getFlashChipId());
+  Serial.print("Flash chip SIZE is             :: ");
+  Serial.println(ESP.getFlashChipSize());
+  Serial.print("Flash chip Speed is            :: ");
+  Serial.println(ESP.getFlashChipSpeed());
+  Serial.print("CPU instruction cycle count is :: ");
+  Serial.println(ESP.getCycleCount());
+  //Serial.print("Supply Voltage (VCC) is :: ");
+  //Serial.println(ESP.getVcc()); //add first      ADC_MODE(ADC_VCC);
+  
+  
 /////////////////////////////////////////////////
   Serial.println();
   WiFi.mode(WIFI_STA);
@@ -206,7 +271,7 @@ void setup() {
   // Wait a bit before scanning again
   delay(1000);
 ////////////////////////////////////////////////////////
-  
+  WiFi.mode(WIFI_AP_STA);
   Serial.println();
   Serial.println("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
