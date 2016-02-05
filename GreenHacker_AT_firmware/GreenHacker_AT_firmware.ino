@@ -34,6 +34,9 @@ byte bAPMAC[6];
 
 /////////////////////
 
+void handleRoot() {
+  server.send(200, "text/html", "<h1>You are connected</h1>");
+}
 
 void KKL() {
   Serial.println();
@@ -215,7 +218,8 @@ void AT_CWJAP() {
   
 }
 
-void AT_CIPMUX(){
+
+void AT_CIPMUX(){   //###
   char* sFlag;
     
   char *arg;
@@ -233,57 +237,45 @@ void AT_CIPMUX(){
     sFlag="1";
   }
 
- 
-   
-
   Serial.println("");
-  Serial.println("WiFi connected");  
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("Sorry Guy, We can't find a way to set Multi Point Mode :(( ");  
+  
 
 }
 
 void AT_CIPSERVER(){
-  char* sSSID;
-  char* sPASS;
+  char* sFlag;
+  char* sPort;
   
   char *arg;
   Serial.println();
-  Serial.println("AT+CWJAP OK");
+  Serial.println("AT+CIPSERVER OK");
   arg = sCmd.next();
  
   if (arg != NULL) {
-    sSSID = arg;
-    Serial.print("SSID was: ");
-    Serial.println(sSSID);
+    sFlag = arg;    
   }
   else {
-    Serial.println("No SSID, Please TRY AGAIN!");
+    Serial.println("No arg, Please TRY AGAIN!");
     //return 1; //error
   }
 
   arg = sCmd.next();
   if (arg != NULL) {
-    sPASS = arg;
-    Serial.print("PASSWORD was: ");
-    Serial.println(sPASS);
+    sPort = arg; 
       
   }
   else {
-    Serial.println("No PASSWORD, using NULL instead");
-    sPASS="";
-  }
-   WiFi.begin(sSSID, sPASS);
-  
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+    Serial.println("No Port no, using 80 instead");
+    sPort="80";
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");  
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  server.on("/", handleRoot);
+  server.begin();
+  Serial.println("HTTP server started");
+  
+  //Serial.println("");
+  //Serial.println("Sorry Guy, We can't find a way to set Multi Point Mode :(( ");
 
 }
 ////////////////////
@@ -345,9 +337,7 @@ void unrecognized(const char *command) {
 }
 
 
-void handleRoot() {
-  server.send(200, "text/html", "<h1>You are connected</h1>");
-}
+
 
 
 void setup() {
@@ -453,7 +443,11 @@ AT_CWLAP();
   Serial.print(":");
   Serial.print(bLocalMAC[0],HEX);
   Serial.println("");
-  
+  Serial.print("SSID     :: ");
+  Serial.println(ssid);
+  Serial.print("PASSWORD :: ");
+  Serial.println(password);
+
   server.on("/", handleRoot);
   server.begin();
   Serial.println("HTTP server started");
